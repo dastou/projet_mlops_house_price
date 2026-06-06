@@ -1,0 +1,2 @@
+# Dépendances du projet — rempli au fur et à mesure des étapes
+# (laissé vide volontairement, sera complété à l'étape 3)

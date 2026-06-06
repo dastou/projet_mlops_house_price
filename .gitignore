@@ -1,0 +1,68 @@
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# ----- Environnements virtuels -----
+.venv/
+venv/
+env/
+ENV/
+
+# ----- Jupyter -----
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# ----- Données (versionnées via DVC, pas git) -----
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# ----- Modèles (versionnés via DVC, pas git) -----
+models/*
+!models/.gitkeep
+
+# ----- MLflow -----
+mlruns/
+mlflow.db
+mlartifacts/
+
+# ----- DVC -----
+/dvc.lock.bak
+
+# ----- Secrets / config locale -----
+.env
+.env.local
+*.secret
+
+# ----- IDE -----
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# ----- OS -----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----- Tests / couverture -----
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ----- Docker -----
+*.tar
+
+# ----- Logs -----
+*.log
+logs/
