@@ -43,6 +43,9 @@ mlartifacts/
 .env.local
 *.secret
 
+# ----- Fichier de suivi interne (local-only) -----
+PROGRESSION.md
+
 # ----- IDE -----
 .idea/
 .vscode/
