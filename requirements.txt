@@ -1,2 +1,10 @@
-# Dépendances du projet — rempli au fur et à mesure des étapes
-# (laissé vide volontairement, sera complété à l'étape 3)
+# Manipulation de données
+pandas==2.2.3
+numpy==1.26.4
+
+# Machine learning
+scikit-learn==1.5.2
+
+# Jupyter (pour les notebooks d'analyse)
+jupyter==1.1.1
+ipykernel==6.29.5
