@@ -8,3 +8,8 @@ scikit-learn==1.5.2
 # Jupyter (pour les notebooks d'analyse)
 jupyter==1.1.1
 ipykernel==6.29.5
+
+# Visualisation (EDA)
+matplotlib==3.9.2
+seaborn==0.13.2
+missingno==0.5.2
