@@ -59,11 +59,15 @@ COLS_NAN_STRUCTURELLES_NUMERIQUES = [
 
 # Variables connues seulement au moment de la signature de la vente (T5).
 # Inutilisables pour estimer un prix avant mise en vente (T1) : data leakage metier.
+#
+# Note importante sur YrSold :
+# YrSold n'est PAS dans cette liste car elle est utilisee par features.py
+# pour calculer building_age, remodel_age, garage_age. Elle est supprimee
+# uniquement apres la creation des features (cf. creer_ages dans features.py).
 VARS_LEAKAGE_METIER = [
     "SaleType",
     "SaleCondition",
     "MoSold",
-    "YrSold",
 ]
 
 # Variables sans pouvoir predictif a retirer du dataset.
@@ -163,11 +167,15 @@ def supprimer_id(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def exclure_variables_leakage(df: pd.DataFrame) -> pd.DataFrame:
-    """Retire les 4 variables identifiees comme data leakage metier.
+    """Retire les variables identifiees comme data leakage metier.
 
-    Variables exclues : SaleType, SaleCondition, MoSold, YrSold.
+    Variables exclues : SaleType, SaleCondition, MoSold.
     Elles decrivent la transaction et sont inconnues au moment ou
     Laplace Immo souhaite estimer le prix (avant mise en vente).
+
+    YrSold est conservee temporairement : elle sera utilisee par features.py
+    pour calculer les ages (building_age, remodel_age, garage_age), puis
+    supprimee dans la fonction creer_ages.
 
     Args:
         df: DataFrame pouvant contenir ces variables.
