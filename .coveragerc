@@ -1,0 +1,21 @@
+[run]
+source = src,api
+omit =
+    src/stages/*
+    */tests/*
+    */__init__.py
+
+[report]
+# Lignes a exclure de la mesure de couverture
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
+    if TYPE_CHECKING:
+    \.\.\.
+show_missing = True
+skip_covered = False
+precision = 1
+
+[html]
+directory = htmlcov
