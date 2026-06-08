@@ -1,0 +1,71 @@
+# Equivalent .gitignore pour le build Docker.
+# Empeche Docker de copier des fichiers inutiles dans le contexte de build
+# (gagne du temps + reduit la taille de l'image).
+
+# Versioning et configuration
+.git/
+.gitignore
+.dvc/
+.dvcignore
+dvc.lock
+dvc.yaml
+params.yaml
+
+# Donnees brutes et processed (geres par DVC, pas necessaire dans l'image)
+data/
+
+# Modeles non utilises par l'API
+# (final_model.pkl est explicitement copie dans le Dockerfile)
+models/*
+!models/final_model.pkl
+!models/.gitkeep
+
+# Notebooks (dev uniquement)
+notebooks/
+
+# Tests (dev uniquement)
+tests/
+pytest.ini
+.coveragerc
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# MLflow (tracking local)
+mlruns/
+mlflow.db
+mlartifacts/
+
+# Metriques DVC
+metrics/
+
+# Documentation et fichiers Markdown
+*.md
+docs/
+
+# Cache et bytecode Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+build/
+dist/
+
+# IDE et OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Logs et secrets
+*.log
+.env
+.env.local
