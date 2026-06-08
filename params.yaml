@@ -1,0 +1,14 @@
+# Parametres centralises du pipeline DVC
+# Toute modification ici declenche le re-run automatique du stage affecte.
+
+prepare:
+  test_size: 0.2
+  random_state: 42
+
+train:
+  # Hyperparametres CatBoost optimaux trouves par RandomizedSearchCV (notebook 04)
+  iterations: 1200
+  depth: 5
+  learning_rate: 0.05
+  l2_leaf_reg: 7
+  random_state: 42

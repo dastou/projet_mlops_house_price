@@ -1,0 +1,43 @@
+stages:
+  prepare:
+    cmd: python -m src.stages.prepare
+    deps:
+      - src/data.py
+      - src/preprocessing.py
+      - src/features.py
+      - src/stages/prepare.py
+    params:
+      - prepare.test_size
+      - prepare.random_state
+    outs:
+      - data/processed/X_train.pkl
+      - data/processed/X_test.pkl
+      - data/processed/y_train.pkl
+      - data/processed/y_test.pkl
+
+  train:
+    cmd: python -m src.stages.train
+    deps:
+      - src/pipeline.py
+      - src/stages/train.py
+      - data/processed/X_train.pkl
+      - data/processed/y_train.pkl
+    params:
+      - train.iterations
+      - train.depth
+      - train.learning_rate
+      - train.l2_leaf_reg
+      - train.random_state
+    outs:
+      - models/final_model.pkl
+
+  evaluate:
+    cmd: python -m src.stages.evaluate
+    deps:
+      - src/stages/evaluate.py
+      - models/final_model.pkl
+      - data/processed/X_test.pkl
+      - data/processed/y_test.pkl
+    metrics:
+      - metrics/metrics.json:
+          cache: false
