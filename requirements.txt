@@ -21,3 +21,9 @@ catboost==1.2.7
 
 # Tracking et MLOps
 mlflow==2.18.0
+dvc==3.67.1
+
+# API REST
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
