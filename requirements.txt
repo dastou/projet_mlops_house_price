@@ -16,11 +16,11 @@ missingno==0.5.2
 
 # Modeles avances
 xgboost==2.1.3
-lightgbm==4.5.0
+lightgbm==4.6.0
 catboost==1.2.7
 
 # Tracking et MLOps
-mlflow==2.18.0
+mlflow==3.11.1
 dvc==3.67.1
 
 # API REST
