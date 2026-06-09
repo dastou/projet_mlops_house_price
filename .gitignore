@@ -1,4 +1,4 @@
-# ----- Python -----
+# Python 
 __pycache__/
 *.py[cod]
 *$py.class
@@ -9,55 +9,58 @@ build/
 dist/
 .eggs/
 
-# ----- Environnements virtuels -----
+# Environnements virtuels
 .venv/
 venv/
 env/
 ENV/
 
-# ----- Jupyter -----
+# Jupyter
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
 *.nbconvert.ipynb
 
-# ----- Données (versionnées via DVC, pas git) -----
+# Données (versionnées via DVC, pas git)
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
-# ----- Modèles (versionnés via DVC, pas git) -----
+# Modèles (versionnés via DVC, pas git)
+# Exception : final_model.pkl est aussi commité dans Git pour que la CI
+# puisse tester l'API et builder l'image Docker sans setup DVC remote.
 models/*
 !models/.gitkeep
+!models/final_model.pkl
 
-# ----- MLflow -----
+# MLflow
 mlruns/
 mlflow.db
 mlartifacts/
 
-# ----- DVC -----
+# DVC
 /dvc.lock.bak
 
-# ----- Secrets / config locale -----
+# Secrets / config locale
 .env
 .env.local
 *.secret
 
-# ----- Fichier de suivi interne (local-only) -----
+# Fichier de suivi interne (local-only)
 PROGRESSION.md
 
-# ----- IDE -----
+# IDE
 .idea/
 .vscode/
 *.iml
 *.swp
 
-# ----- OS -----
+# OS
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ----- Tests / couverture -----
+# Tests / couverture
 .pytest_cache/
 .coverage
 .coverage.*
@@ -65,9 +68,9 @@ htmlcov/
 coverage.xml
 .tox/
 
-# ----- Docker -----
+# Docker
 *.tar
 
-# ----- Logs -----
+# Logs
 *.log
 logs/
