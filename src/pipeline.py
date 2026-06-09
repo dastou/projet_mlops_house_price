@@ -29,6 +29,7 @@ Fonctions et classes exposees :
     - construire_preprocessor : construit le ColumnTransformer
     - construire_pipeline : construit le Pipeline complet (sans modele)
 """
+
 from __future__ import annotations
 
 import logging
@@ -73,6 +74,7 @@ ORDRE_QUALITES = ["None", "Po", "Fa", "TA", "Gd", "Ex"]
 # ----------------------------------------------------------------------------
 # Custom transformer : imputation de LotFrontage par mediane de quartier
 # ----------------------------------------------------------------------------
+
 
 class LotFrontageImputer(BaseEstimator, TransformerMixin):
     """Impute les NaN de LotFrontage par la mediane de chaque quartier.
@@ -132,9 +134,7 @@ class LotFrontageImputer(BaseEstimator, TransformerMixin):
 
         # Map quartier -> mediane apprise. Fallback sur la mediane globale.
         quartiers_nan = X.loc[masque_nan, "Neighborhood"]
-        valeurs_imputees = quartiers_nan.map(self.medianes_).fillna(
-            self.mediane_globale_
-        )
+        valeurs_imputees = quartiers_nan.map(self.medianes_).fillna(self.mediane_globale_)
         X.loc[masque_nan, "LotFrontage"] = valeurs_imputees.values
 
         logger.info("LotFrontageImputer transform : %d NaN imputes", nb_nan)
@@ -144,6 +144,7 @@ class LotFrontageImputer(BaseEstimator, TransformerMixin):
 # ----------------------------------------------------------------------------
 # Identification des groupes de colonnes
 # ----------------------------------------------------------------------------
+
 
 def identifier_colonnes(X: pd.DataFrame) -> tuple[list[str], list[str], list[str]]:
     """Identifie les trois groupes de colonnes pour le ColumnTransformer.
@@ -158,9 +159,7 @@ def identifier_colonnes(X: pd.DataFrame) -> tuple[list[str], list[str], list[str
             - cols_nom : autres colonnes catégorielles (object non ordinales)
     """
     cols_ord = [c for c in ORDINAL_QUALITES if c in X.columns]
-    cols_nom = [
-        c for c in X.select_dtypes(include="object").columns if c not in cols_ord
-    ]
+    cols_nom = [c for c in X.select_dtypes(include="object").columns if c not in cols_ord]
     cols_num = list(X.select_dtypes(include=["number"]).columns)
     return cols_num, cols_ord, cols_nom
 
@@ -168,6 +167,7 @@ def identifier_colonnes(X: pd.DataFrame) -> tuple[list[str], list[str], list[str
 # ----------------------------------------------------------------------------
 # Construction du ColumnTransformer et du Pipeline complet
 # ----------------------------------------------------------------------------
+
 
 def construire_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
     """Construit le ColumnTransformer pour le preprocessing statistique.
@@ -185,24 +185,33 @@ def construire_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
     """
     cols_num, cols_ord, cols_nom = identifier_colonnes(X)
 
-    num_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("scaler", StandardScaler()),
-    ])
+    num_pipeline = Pipeline(
+        [
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+        ]
+    )
 
-    ord_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="constant", fill_value="None")),
-        ("encoder", OrdinalEncoder(
-            categories=[ORDRE_QUALITES] * len(cols_ord),
-            handle_unknown="use_encoded_value",
-            unknown_value=-1,
-        )),
-    ])
+    ord_pipeline = Pipeline(
+        [
+            ("imputer", SimpleImputer(strategy="constant", fill_value="None")),
+            (
+                "encoder",
+                OrdinalEncoder(
+                    categories=[ORDRE_QUALITES] * len(cols_ord),
+                    handle_unknown="use_encoded_value",
+                    unknown_value=-1,
+                ),
+            ),
+        ]
+    )
 
-    nom_pipeline = Pipeline([
-        ("imputer", SimpleImputer(strategy="most_frequent")),
-        ("encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
-    ])
+    nom_pipeline = Pipeline(
+        [
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+        ]
+    )
 
     return ColumnTransformer(
         transformers=[
@@ -236,10 +245,12 @@ def construire_pipeline(X: pd.DataFrame) -> Pipeline:
     Returns:
         Pipeline sklearn fittable sur X_train.
     """
-    return Pipeline([
-        ("lotfrontage_imputer", LotFrontageImputer()),
-        ("column_transformer", construire_preprocessor(X)),
-    ])
+    return Pipeline(
+        [
+            ("lotfrontage_imputer", LotFrontageImputer()),
+            ("column_transformer", construire_preprocessor(X)),
+        ]
+    )
 
 
 # ----------------------------------------------------------------------------
@@ -271,14 +282,12 @@ if __name__ == "__main__":
     print(f"\nShape X : {X.shape}, shape y : {y.shape}")
 
     # 3. Split train / test
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     print(f"Train : {X_train.shape}, Test : {X_test.shape}")
 
     # 4. Identification des groupes de colonnes
     cols_num, cols_ord, cols_nom = identifier_colonnes(X_train)
-    print(f"\nGroupes de colonnes identifies :")
+    print("\nGroupes de colonnes identifies :")
     print(f"  Numeriques : {len(cols_num)} colonnes")
     print(f"  Ordinales  : {len(cols_ord)} colonnes")
     print(f"    -> {cols_ord}")
@@ -289,17 +298,19 @@ if __name__ == "__main__":
     X_train_processed = pipeline.fit_transform(X_train)
     X_test_processed = pipeline.transform(X_test)
 
-    print(f"\nApres preprocessing :")
+    print("\nApres preprocessing :")
     print(f"  X_train_processed : shape {X_train_processed.shape}, dtype {X_train_processed.dtype}")
     print(f"  X_test_processed  : shape {X_test_processed.shape}")
     print(f"  NaN restants dans X_train_processed : {int(np.isnan(X_train_processed).sum())}")
 
     # 6. Sanity check : entrainer un Ridge baseline
-    print(f"\nSanity check avec Ridge :")
-    pipeline_complet = Pipeline([
-        ("preprocessing", construire_pipeline(X_train)),
-        ("modele", Ridge(alpha=1.0, random_state=42)),
-    ])
+    print("\nSanity check avec Ridge :")
+    pipeline_complet = Pipeline(
+        [
+            ("preprocessing", construire_pipeline(X_train)),
+            ("modele", Ridge(alpha=1.0, random_state=42)),
+        ]
+    )
     pipeline_complet.fit(X_train, y_train)
     y_pred_log = pipeline_complet.predict(X_test)
 

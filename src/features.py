@@ -19,6 +19,7 @@ Note importante sur les ages :
     on utilise une annee d'estimation fournie en parametre (ou la constante
     ANNEE_ESTIMATION_DEFAUT). YrSold est supprimee apres calcul des ages.
 """
+
 from __future__ import annotations
 
 import logging
@@ -57,6 +58,7 @@ COLS_BATHROOMS_HALF = ["HalfBath", "BsmtHalfBath"]
 # ----------------------------------------------------------------------------
 # Fonctions de creation de features (pures)
 # ----------------------------------------------------------------------------
+
 
 def creer_totalsf(df: pd.DataFrame) -> pd.DataFrame:
     """Cree la feature TotalSF : surface habitable totale.
@@ -107,9 +109,8 @@ def creer_totalbathrooms(df: pd.DataFrame) -> pd.DataFrame:
         Nouveau DataFrame avec la colonne TotalBathrooms ajoutee.
     """
     df = df.copy()
-    df["TotalBathrooms"] = (
-        df[COLS_BATHROOMS_FULL].sum(axis=1)
-        + 0.5 * df[COLS_BATHROOMS_HALF].sum(axis=1)
+    df["TotalBathrooms"] = df[COLS_BATHROOMS_FULL].sum(axis=1) + 0.5 * df[COLS_BATHROOMS_HALF].sum(
+        axis=1
     )
     logger.info("creer_totalbathrooms : feature TotalBathrooms ajoutee")
     return df
@@ -208,6 +209,7 @@ def creer_binaires(df: pd.DataFrame) -> pd.DataFrame:
 # Orchestrateur
 # ----------------------------------------------------------------------------
 
+
 def creer_features(
     df: pd.DataFrame,
     annee_estimation: int | None = None,
@@ -275,10 +277,10 @@ if __name__ == "__main__":
     print(f"\nShape final : {df_feat.shape}")
     print(f"YrSold encore presente ? {'YrSold' in df_feat.columns}")
 
-    print(f"\nStatistiques des nouvelles features :")
+    print("\nStatistiques des nouvelles features :")
     print(df_feat[nouvelles_features].describe().T.round(2))
 
-    print(f"\nPart de maisons avec chaque equipement :")
+    print("\nPart de maisons avec chaque equipement :")
     for col in ["has_pool", "has_garage", "has_basement", "has_fireplace", "has_2ndfloor"]:
         taux = df_feat[col].mean() * 100
         print(f"  {col:18s} : {taux:5.1f} %")

@@ -1,7 +1,6 @@
 """Tests unitaires pour src/data.py."""
-from __future__ import annotations
 
-import pytest
+from __future__ import annotations
 
 from src.data import NOM_CIBLE, separer_features_cible
 

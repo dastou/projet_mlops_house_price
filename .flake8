@@ -1,0 +1,23 @@
+# Configuration de flake8 (PEP 8 + checks logiques).
+# flake8 ne lit pas pyproject.toml nativement, d'ou ce fichier separe.
+
+[flake8]
+max-line-length = 100
+
+# E203 et W503 sont en conflit avec black, on les desactive.
+# E203 : "whitespace before ':'" (black met un espace avant : dans les slices).
+# W503 : "line break before binary operator" (black casse les lignes ainsi).
+extend-ignore = E203, W503
+
+exclude =
+    .venv,
+    venv,
+    env,
+    mlruns,
+    mlartifacts,
+    .dvc,
+    build,
+    dist,
+    notebooks,
+    __pycache__,
+    .pytest_cache

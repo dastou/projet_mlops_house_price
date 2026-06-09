@@ -3,6 +3,7 @@
 Les fixtures avec scope='session' sont chargees une seule fois pour toute
 la session de tests, ce qui evite de recharger les donnees a chaque test.
 """
+
 from __future__ import annotations
 
 import sys
@@ -16,8 +17,8 @@ chemin_projet = Path(__file__).resolve().parent.parent
 if str(chemin_projet) not in sys.path:
     sys.path.insert(0, str(chemin_projet))
 
-from src.features import creer_features
-from src.preprocessing import nettoyer_donnees
+from src.features import creer_features  # noqa: E402
+from src.preprocessing import nettoyer_donnees  # noqa: E402
 
 # Echantillon stratifie (98 lignes, 25 quartiers) genere une fois via
 # tests/fixtures/_generer_sample.py et committe dans Git.

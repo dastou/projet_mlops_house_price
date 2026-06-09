@@ -10,6 +10,7 @@ chaine "None" pour rester coherent avec le preprocessing du pipeline.
 LotFrontage peut etre None (NaN) : la mediane par quartier sera appliquee
 par le custom transformer LotFrontageImputer.
 """
+
 from __future__ import annotations
 
 from typing import Optional
@@ -61,8 +62,12 @@ class MaisonInput(BaseModel):
     OverallCond: int = Field(..., ge=1, le=10, description="Etat general (1-10)", examples=[5])
 
     # ----- Construction et renovation -----
-    YearBuilt: int = Field(..., ge=1800, le=2030, description="Annee de construction", examples=[2003])
-    YearRemodAdd: int = Field(..., ge=1800, le=2030, description="Annee de derniere renovation", examples=[2003])
+    YearBuilt: int = Field(
+        ..., ge=1800, le=2030, description="Annee de construction", examples=[2003]
+    )
+    YearRemodAdd: int = Field(
+        ..., ge=1800, le=2030, description="Annee de derniere renovation", examples=[2003]
+    )
 
     # ----- Toit -----
     RoofStyle: str = Field(..., examples=["Gable"])
@@ -71,8 +76,12 @@ class MaisonInput(BaseModel):
     # ----- Exterieur -----
     Exterior1st: str = Field(..., examples=["VinylSd"])
     Exterior2nd: str = Field(..., examples=["VinylSd"])
-    MasVnrType: str = Field(..., description="None si pas de parement maconne", examples=["BrkFace"])
-    MasVnrArea: float = Field(..., ge=0, description="Surface du parement (sq ft)", examples=[196.0])
+    MasVnrType: str = Field(
+        ..., description="None si pas de parement maconne", examples=["BrkFace"]
+    )
+    MasVnrArea: float = Field(
+        ..., ge=0, description="Surface du parement (sq ft)", examples=[196.0]
+    )
     ExterQual: str = Field(..., description="Qualite materiau exterieur", examples=["Gd"])
     ExterCond: str = Field(..., examples=["TA"])
 
@@ -86,7 +95,9 @@ class MaisonInput(BaseModel):
     BsmtFinType2: str = Field(..., description="None si pas de sous-sol", examples=["Unf"])
     BsmtFinSF2: int = Field(..., ge=0, examples=[0])
     BsmtUnfSF: int = Field(..., ge=0, examples=[150])
-    TotalBsmtSF: int = Field(..., ge=0, description="Surface totale du sous-sol (sq ft)", examples=[856])
+    TotalBsmtSF: int = Field(
+        ..., ge=0, description="Surface totale du sous-sol (sq ft)", examples=[856]
+    )
 
     # ----- Chauffage et electricite -----
     Heating: str = Field(..., examples=["GasA"])
@@ -96,10 +107,16 @@ class MaisonInput(BaseModel):
 
     # ----- Surfaces interieures -----
     # Aliases pour les noms commencant par un chiffre (impossible en Python)
-    firstFlrSF: int = Field(..., alias="1stFlrSF", ge=0, description="Surface rdc (sq ft)", examples=[856])
-    secondFlrSF: int = Field(..., alias="2ndFlrSF", ge=0, description="Surface etage (sq ft)", examples=[854])
+    firstFlrSF: int = Field(
+        ..., alias="1stFlrSF", ge=0, description="Surface rdc (sq ft)", examples=[856]
+    )
+    secondFlrSF: int = Field(
+        ..., alias="2ndFlrSF", ge=0, description="Surface etage (sq ft)", examples=[854]
+    )
     LowQualFinSF: int = Field(..., ge=0, examples=[0])
-    GrLivArea: int = Field(..., ge=0, description="Surface habitable totale (sq ft)", examples=[1710])
+    GrLivArea: int = Field(
+        ..., ge=0, description="Surface habitable totale (sq ft)", examples=[1710]
+    )
 
     # ----- Salles de bain -----
     BsmtFullBath: int = Field(..., ge=0, examples=[1])
@@ -111,7 +128,9 @@ class MaisonInput(BaseModel):
     BedroomAbvGr: int = Field(..., ge=0, description="Nombre de chambres", examples=[3])
     KitchenAbvGr: int = Field(..., ge=0, description="Nombre de cuisines", examples=[1])
     KitchenQual: str = Field(..., description="Qualite cuisine (Po/Fa/TA/Gd/Ex)", examples=["Gd"])
-    TotRmsAbvGrd: int = Field(..., ge=0, description="Nombre total de pieces hors SdB", examples=[8])
+    TotRmsAbvGrd: int = Field(
+        ..., ge=0, description="Nombre total de pieces hors SdB", examples=[8]
+    )
     Functional: str = Field(..., examples=["Typ"])
 
     # ----- Cheminees -----

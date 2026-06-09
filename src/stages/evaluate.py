@@ -4,6 +4,7 @@ Calcule les metriques (RMSE log, R2, RMSE dollars, MAE dollars) et les
 ecrit dans metrics/metrics.json. DVC suit ce fichier pour comparer les
 performances entre runs.
 """
+
 from __future__ import annotations
 
 import json

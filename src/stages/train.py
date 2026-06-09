@@ -4,6 +4,7 @@ Lit les donnees preprocessed et les hyperparametres CatBoost depuis
 params.yaml, entraine le pipeline complet (preprocessing + modele) et
 sauvegarde le modele dans models/final_model.pkl.
 """
+
 from __future__ import annotations
 
 import logging
@@ -39,18 +40,23 @@ def main() -> None:
     logger.info("Donnees train chargees : %s", X_train.shape)
 
     # Construction du pipeline complet : preprocessing + CatBoost
-    pipeline = Pipeline([
-        ("preprocessing", construire_pipeline(X_train)),
-        ("modele", CatBoostRegressor(
-            iterations=params_train["iterations"],
-            depth=params_train["depth"],
-            learning_rate=params_train["learning_rate"],
-            l2_leaf_reg=params_train["l2_leaf_reg"],
-            random_state=params_train["random_state"],
-            verbose=False,
-            allow_writing_files=False,
-        )),
-    ])
+    pipeline = Pipeline(
+        [
+            ("preprocessing", construire_pipeline(X_train)),
+            (
+                "modele",
+                CatBoostRegressor(
+                    iterations=params_train["iterations"],
+                    depth=params_train["depth"],
+                    learning_rate=params_train["learning_rate"],
+                    l2_leaf_reg=params_train["l2_leaf_reg"],
+                    random_state=params_train["random_state"],
+                    verbose=False,
+                    allow_writing_files=False,
+                ),
+            ),
+        ]
+    )
 
     pipeline.fit(X_train, y_train)
     logger.info("Entrainement termine")

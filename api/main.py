@@ -14,6 +14,7 @@ Lancer en local :
 
 Puis ouvrir http://localhost:8000/docs (Swagger UI).
 """
+
 from __future__ import annotations
 
 import logging

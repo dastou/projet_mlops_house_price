@@ -14,6 +14,7 @@ maisons de chaque quartier pour que les tests couvrent toutes les zones
 Usage (depuis la racine du projet) :
     python -m tests.fixtures._generer_sample
 """
+
 from __future__ import annotations
 
 import logging
@@ -27,7 +28,7 @@ chemin_projet = Path(__file__).resolve().parent.parent.parent
 if str(chemin_projet) not in sys.path:
     sys.path.insert(0, str(chemin_projet))
 
-from src.data import charger_donnees
+from src.data import charger_donnees  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +50,7 @@ def generer_echantillon() -> pd.DataFrame:
         DataFrame de ~100 lignes avec les memes colonnes que le dataset complet.
     """
     df = charger_donnees()
-    logger.info("Dataset complet charge : %d lignes x %d colonnes",
-                df.shape[0], df.shape[1])
+    logger.info("Dataset complet charge : %d lignes x %d colonnes", df.shape[0], df.shape[1])
 
     echantillon = (
         df.groupby("Neighborhood", group_keys=False)

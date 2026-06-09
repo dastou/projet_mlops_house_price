@@ -16,6 +16,7 @@ Fonctions exposees :
     - exclure_variables_leakage : retire 4 variables connues seulement apres vente
     - nettoyer_donnees : orchestrateur qui enchaine les 5 fonctions ci-dessus
 """
+
 from __future__ import annotations
 
 import logging
@@ -78,6 +79,7 @@ VARS_INUTILES = ["Id"]
 # Fonctions de nettoyage (deterministes)
 # ----------------------------------------------------------------------------
 
+
 def supprimer_outliers(df: pd.DataFrame) -> pd.DataFrame:
     """Retire les outliers identifies en EDA.
 
@@ -121,9 +123,7 @@ def imputer_nan_categorielles(df: pd.DataFrame) -> pd.DataFrame:
     cols_presentes = [c for c in COLS_NAN_STRUCTURELLES_CATEGORIELLES if c in df.columns]
     for col in cols_presentes:
         df[col] = df[col].fillna("None")
-    logger.info(
-        "imputer_nan_categorielles : %d colonnes traitees", len(cols_presentes)
-    )
+    logger.info("imputer_nan_categorielles : %d colonnes traitees", len(cols_presentes))
     return df
 
 
@@ -143,9 +143,7 @@ def imputer_nan_numeriques(df: pd.DataFrame) -> pd.DataFrame:
     cols_presentes = [c for c in COLS_NAN_STRUCTURELLES_NUMERIQUES if c in df.columns]
     for col in cols_presentes:
         df[col] = df[col].fillna(0)
-    logger.info(
-        "imputer_nan_numeriques : %d colonnes traitees", len(cols_presentes)
-    )
+    logger.info("imputer_nan_numeriques : %d colonnes traitees", len(cols_presentes))
     return df
 
 
@@ -193,6 +191,7 @@ def exclure_variables_leakage(df: pd.DataFrame) -> pd.DataFrame:
 # ----------------------------------------------------------------------------
 # Orchestrateur
 # ----------------------------------------------------------------------------
+
 
 def nettoyer_donnees(df: pd.DataFrame) -> pd.DataFrame:
     """Applique l'ensemble du nettoyage deterministe dans le bon ordre.
@@ -248,5 +247,5 @@ if __name__ == "__main__":
     # (traites dans le pipeline statistique a l'etape 7).
     nan_restants = donnees_propres.isna().sum()
     nan_restants = nan_restants[nan_restants > 0].sort_values(ascending=False)
-    print(f"\nColonnes avec NaN restants (traitees a l'etape pipeline) :")
+    print("\nColonnes avec NaN restants (traitees a l'etape pipeline) :")
     print(nan_restants)

@@ -10,6 +10,7 @@ Source du dataset :
     1460 maisons d'Ames (Iowa, USA) decrites par 79 variables explicatives
     + la cible SalePrice (prix de vente en dollars).
 """
+
 from __future__ import annotations
 
 import logging
@@ -57,9 +58,7 @@ def charger_donnees(
             parser="auto",
         )
     except Exception as e:
-        raise RuntimeError(
-            "Echec du telechargement OpenML. Verifier la connexion internet."
-        ) from e
+        raise RuntimeError("Echec du telechargement OpenML. Verifier la connexion internet.") from e
 
     # On combine les features et la cible en un seul DataFrame.
     # Pratique pour l'EDA : tout est explorable d'un coup.
@@ -96,9 +95,7 @@ def separer_features_cible(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
         ValueError: si la colonne SalePrice est absente du DataFrame.
     """
     if NOM_CIBLE not in df.columns:
-        raise ValueError(
-            f"La colonne cible '{NOM_CIBLE}' est absente du DataFrame."
-        )
+        raise ValueError(f"La colonne cible '{NOM_CIBLE}' est absente du DataFrame.")
 
     X = df.drop(columns=[NOM_CIBLE])
     y = df[NOM_CIBLE]

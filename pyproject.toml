@@ -1,0 +1,19 @@
+# Configuration centrale du projet (outils Python modernes).
+# Lue automatiquement par black, pytest, et d'autres outils compatibles PEP 518.
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+exclude = '''
+/(
+    \.venv
+  | venv
+  | env
+  | mlruns
+  | mlartifacts
+  | \.dvc
+  | build
+  | dist
+  | notebooks
+)/
+'''

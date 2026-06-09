@@ -1,0 +1,14 @@
+# Dependances pour les tests et la qualite de code (CI/CD).
+# Utilise par GitHub Actions et localement pour le developpement.
+
+# Pour installer : pip install -r requirements-dev.txt
+# (a installer en plus de requirements.txt pour le dev local)
+
+# Tests
+pytest==8.3.4
+pytest-cov==6.0.0
+httpx==0.28.1
+
+# Qualite de code
+flake8==7.1.1
+black==24.10.0
