@@ -16,15 +16,23 @@ chemin_projet = Path(__file__).resolve().parent.parent
 if str(chemin_projet) not in sys.path:
     sys.path.insert(0, str(chemin_projet))
 
-from src.data import charger_donnees
 from src.features import creer_features
 from src.preprocessing import nettoyer_donnees
+
+# Echantillon stratifie (98 lignes, 25 quartiers) genere une fois via
+# tests/fixtures/_generer_sample.py et committe dans Git.
+# Permet aux tests de tourner sans dependance reseau (OpenML).
+CHEMIN_ECHANTILLON = Path(__file__).parent / "fixtures" / "house_prices_sample.csv"
 
 
 @pytest.fixture(scope="session")
 def donnees_brutes() -> pd.DataFrame:
-    """Donnees Ames brutes depuis OpenML (charge une fois pour la session)."""
-    return charger_donnees()
+    """Donnees Ames sur echantillon local (charge une fois pour la session).
+
+    Lit tests/fixtures/house_prices_sample.csv au lieu d'appeler fetch_openml.
+    Tests rapides, deterministes et independants d'Internet.
+    """
+    return pd.read_csv(CHEMIN_ECHANTILLON)
 
 
 @pytest.fixture(scope="session")
