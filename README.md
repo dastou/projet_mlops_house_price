@@ -228,20 +228,22 @@ Pour reference, ce score (RMSE log < 0.12) placerait le modele dans le **top 5% 
 
 ## 7. Installation et lancement
 
-### Pre-requis
+Le projet propose **3 modes d'utilisation** selon ton objectif. Chacun commence par les memes pre-requis communs.
 
-- Python 3.11 (via `conda` recommande)
-- Git
-- Docker (optionnel, pour le lancement conteneurise)
+### Pre-requis communs
 
-### Installation locale
+- **Python 3.11** : installation recommandee via Anaconda ou Miniconda.
+- **Git** : pour cloner le depot.
+- **Docker Desktop** : uniquement si tu veux executer le Mode 3.
+
+Avant de choisir un mode, executer ces 3 etapes une seule fois :
 
 ```bash
 # 1. Cloner le depot
 git clone https://github.com/dastou/projet_mlops_house_price.git
 cd projet_mlops_house_price
 
-# 2. Creer et activer l'environnement
+# 2. Creer et activer l'environnement Python
 conda create -n mlops_immo python=3.11 -y
 conda activate mlops_immo
 
@@ -249,43 +251,89 @@ conda activate mlops_immo
 pip install -r requirements.txt
 ```
 
-### Lancer l'API FastAPI
+Choisir ensuite l'un des 3 modes ci-dessous selon le besoin.
+
+---
+
+### Mode 1 : Demarrage rapide (utiliser le simulateur)
+
+Le cas le plus courant : voir l'interface tourner et tester des estimations.
+
+Dans un **premier terminal**, lancer l'API :
 
 ```bash
 uvicorn api.main:app --reload
 ```
 
-Endpoints disponibles :
-- `http://localhost:8000/docs` : documentation Swagger interactive
-- `http://localhost:8000/health` : healthcheck (renvoie `{"status":"ok","model_loaded":true}`)
-- `POST http://localhost:8000/predict` : estimation de prix
+L'API est accessible sur `http://localhost:8000` :
+- `/docs` : documentation Swagger interactive
+- `/health` : healthcheck (renvoie `{"status":"ok","model_loaded":true}`)
+- `POST /predict` : endpoint d'estimation
 
-### Lancer l'interface Gradio
-
-Dans un second terminal, **avec l'API deja en marche** :
+Dans un **second terminal** (en gardant le premier ouvert), lancer l'interface Gradio :
 
 ```bash
 python ui/app.py
 ```
 
-Acces : `http://localhost:7860`
+Acces a l'interface : `http://localhost:7860`. Un navigateur s'ouvre automatiquement.
 
-### Lancer avec Docker
+---
+
+### Mode 2 : Reproduire le pipeline et explorer les notebooks
+
+Pour comprendre comment le modele a ete construit, ou pour le re-entrainer.
+
+**Explorer les notebooks dans l'ordre** :
+
+```bash
+jupyter notebook
+```
+
+Puis ouvrir successivement :
+1. `notebooks/house_price_01_analyse.ipynb` : analyse exploratoire (EDA).
+2. `notebooks/house_price_02_preprocessing.ipynb` : nettoyage et feature engineering.
+3. `notebooks/house_price_03_essais.ipynb` : comparaison de 11 modeles avec tracking MLflow.
+4. `notebooks/house_price_04_final.ipynb` : tuning du modele final et sauvegarde du `.pkl`.
+
+**Reproduire le pipeline DVC** :
+
+```bash
+dvc repro    # rejoue les 3 stages : prepare -> train -> evaluate
+dvc dag      # affiche le graphe des dependances entre les stages
+```
+
+`dvc repro` telecharge les donnees depuis OpenML, applique le preprocessing, entraine le modele et evalue les metriques. Le fichier `models/final_model.pkl` est regenere a l'identique en environ 12 secondes grace au cache DVC.
+
+**Visualiser les experimentations MLflow** :
+
+```bash
+mlflow ui
+```
+
+Acces : `http://localhost:5000`. Permet de comparer les 11 modeles testes avec leurs hyperparametres et metriques.
+
+---
+
+### Mode 3 : Deploiement avec Docker
+
+Pour deployer l'API sur n'importe quel serveur ou tester l'image conteneurisee.
+
+**Construire l'image** :
 
 ```bash
 docker build -t laplace-immo .
+```
+
+Le build dure environ 3 minutes au premier lancement. L'image fait ~763 MB et contient uniquement ce qui est necessaire pour servir l'API en production (pas les notebooks, ni l'interface Gradio, ni les dependances de developpement).
+
+**Lancer le container** :
+
+```bash
 docker run -p 8000:8000 laplace-immo
 ```
 
-L'image embarque l'API uniquement (763 MB). Healthcheck integre toutes les 30 secondes.
-
-### Reproduire le pipeline complet
-
-```bash
-dvc repro
-```
-
-Telecharge les donnees depuis OpenML, applique le preprocessing, entraine le modele et evalue les metriques. Reproduit le `final_model.pkl` a l'identique.
+L'API est accessible sur `http://localhost:8000/docs`. Un healthcheck s'execute automatiquement toutes les 30 secondes pour verifier que le modele est bien charge en memoire.
 
 ---
 
