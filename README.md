@@ -55,17 +55,17 @@ Le modele final atteint un coefficient de determination **R² = 0.9214** : il ex
 
 ## 2. Demo
 
-### Interface utilisateur Gradio
+L'interface Gradio consomme l'API FastAPI. L'agent renseigne les caracteristiques principales de la maison (les details et caracteristiques particulieres sont optionnels), puis lance l'estimation.
 
-Une interface premium consommant l'API FastAPI, avec saisie progressive (caracteristiques principales + details optionnels + caracteristiques particulieres pour maisons atypiques).
+### 1. Saisie des caracteristiques
 
-![Interface Gradio](docs/img/gradio.png)
+![Formulaire de saisie](docs/img/formulaire.png)
 
-### Documentation Swagger de l'API
+### 2. Estimation du prix
 
-Swagger UI auto-generee, accessible a `http://localhost:8000/docs`.
+L'estimation s'affiche avec une fourchette basse / haute et les principaux facteurs determinants.
 
-![Swagger UI](docs/img/swagger.png)
+![Resultat de l'estimation](docs/img/resultat.png)
 
 ---
 
@@ -250,6 +250,11 @@ conda activate mlops_immo
 # 3. Installer les dependances
 pip install -r requirements.txt
 ```
+
+> **A propos des fichiers `requirements*.txt`** : le projet en contient trois, chacun avec un role precis.
+> - **`requirements.txt`** : toutes les dependances (ML, MLflow, DVC, FastAPI, Gradio, Pytest, ...). C'est celui a installer pour utiliser le projet en local, c'est ce que fait la commande ci-dessus.
+> - **`requirements-api.txt`** : sous-ensemble minimaliste (FastAPI, scikit-learn, CatBoost, pandas, numpy, joblib). Utilise uniquement par le `Dockerfile` pour produire une image legere.
+> - **`requirements-dev.txt`** : outils de developpement (Pytest, pytest-cov, httpx). Utilise par la CI GitHub Actions pour lancer les tests sans installer toutes les dependances ML.
 
 Choisir ensuite l'un des 3 modes ci-dessous selon le besoin.
 

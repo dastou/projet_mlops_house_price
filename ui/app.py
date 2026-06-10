@@ -63,7 +63,69 @@ def estimer_prix(
     has_big_deck,
     big_deck_area,
 ):
-    """Construit le payload, appelle POST /predict, retourne du HTML pour gr.HTML."""
+    """Construit le payload, appelle POST /predict, retourne du HTML pour gr.HTML.
+
+    Les champs principaux sont obligatoires : s'il en manque un, on affiche
+    une erreur sans appeler l'API. Les champs detailles laisses vides sont
+    remplaces par les valeurs typiques du dataset (DEFAULTS).
+    """
+    # ----- Champs principaux obligatoires -----
+    obligatoires = {
+        "Quartier": neighborhood,
+        "Surface habitable": grlivarea,
+        "Qualite generale": overallqual,
+        "Annee de construction": yearbuilt,
+        "Surface sous-sol": totalbsmtsf,
+        "Surface RDC": firstflrsf,
+        "Surface du garage": garagearea,
+        "Salles de bain completes": fullbath,
+        "Chambres": bedrooms,
+        "Qualite exterieure": exterqual,
+    }
+    manquants = [nom for nom, valeur in obligatoires.items() if valeur is None]
+    if manquants:
+        return rendre_erreur(
+            "Champs a renseigner avant l'estimation : " + ", ".join(manquants) + "."
+        )
+
+    # ----- Tolerance de saisie : un 0 dans un champ optionnel dont l'echelle
+    # ne contient pas 0 (note de 1 a 10, annee) vaut "non renseigne" -----
+    if overallcond == 0:
+        overallcond = None
+    if yearremod == 0:
+        yearremod = None
+
+    # ----- Verification des bornes (les optionnels vides sont ignores) -----
+    bornes = [
+        ("Surface habitable", grlivarea, 100, 10000),
+        ("Qualite generale", overallqual, 1, 10),
+        ("Annee de construction", yearbuilt, 1800, 2030),
+        ("Surface sous-sol", totalbsmtsf, 0, 10000),
+        ("Surface RDC", firstflrsf, 100, 8000),
+        ("Surface du garage", garagearea, 0, 3000),
+        ("Salles de bain completes", fullbath, 0, 6),
+        ("Chambres", bedrooms, 0, 12),
+        ("Annee derniere renovation", yearremod, 1800, 2030),
+        ("Etat general", overallcond, 1, 10),
+        ("Porche ouvert", openporchsf, 0, 1000),
+    ]
+    if has_pool:
+        bornes.append(("Surface piscine", pool_area_input, 1, 2000))
+    if has_extra_fp:
+        bornes.append(("Nombre de cheminees", extra_fp_count, 1, 4))
+    if has_big_garage:
+        bornes.append(("Places de garage", big_garage_cars, 1, 5))
+    if has_big_deck:
+        bornes.append(("Surface terrasse", big_deck_area, 1, 1500))
+
+    hors_limites = [
+        f"{nom} : entre {mini} et {maxi}"
+        for nom, valeur, mini, maxi in bornes
+        if valeur is not None and not (mini <= valeur <= maxi)
+    ]
+    if hors_limites:
+        return rendre_erreur("Valeurs hors limites. " + " ; ".join(hors_limites) + ".")
+
     payload = dict(DEFAULTS)
     payload.update(
         {
@@ -77,16 +139,30 @@ def estimer_prix(
             "FullBath": int(fullbath),
             "BedroomAbvGr": int(bedrooms),
             "ExterQual": exterqual,
-            "YearRemodAdd": int(yearremod),
-            "OverallCond": int(overallcond),
-            "HouseStyle": housestyle,
-            "BsmtQual": bsmtqual,
-            "BsmtExposure": bsmtexposure,
-            "GarageFinish": garagefinish,
-            "KitchenQual": kitchenqual,
-            "OpenPorchSF": int(openporchsf),
         }
     )
+
+    # ----- Champs detailles : pris en compte seulement s'ils sont renseignes -----
+    # Une maison jamais renovee a une annee de renovation egale a sa construction.
+    if yearremod is None:
+        payload["YearRemodAdd"] = int(yearbuilt)
+    else:
+        # Une renovation ne peut pas etre anterieure a la construction
+        payload["YearRemodAdd"] = int(max(yearremod, yearbuilt))
+    if overallcond is not None:
+        payload["OverallCond"] = int(overallcond)
+    if housestyle is not None:
+        payload["HouseStyle"] = housestyle
+    if bsmtqual is not None:
+        payload["BsmtQual"] = bsmtqual
+    if bsmtexposure is not None:
+        payload["BsmtExposure"] = bsmtexposure
+    if garagefinish is not None:
+        payload["GarageFinish"] = garagefinish
+    if kitchenqual is not None:
+        payload["KitchenQual"] = kitchenqual
+    if openporchsf is not None:
+        payload["OpenPorchSF"] = int(openporchsf)
 
     if has_pool:
         payload["PoolArea"] = int(pool_area_input)
@@ -481,107 +557,100 @@ def construire_interface() -> gr.Blocks:
                 neighborhood = gr.Dropdown(
                     label="Quartier",
                     choices=NEIGHBORHOODS,
-                    value="NAmes",
+                    value=None,
                 )
                 grlivarea = gr.Number(
                     label="Surface habitable (sq ft)",
-                    value=1500,
+                    value=None,
                     precision=0,
-                    minimum=100,
-                    maximum=10000,
                 )
                 overallqual = gr.Number(
                     label="Qualite generale (1-10)",
-                    value=5,
+                    value=None,
                     precision=0,
-                    minimum=1,
-                    maximum=10,
                 )
                 yearbuilt = gr.Number(
                     label="Annee de construction",
-                    value=1970,
+                    value=None,
                     precision=0,
-                    minimum=1800,
-                    maximum=2030,
                 )
                 totalbsmtsf = gr.Number(
                     label="Surface sous-sol (sq ft)",
-                    value=900,
+                    value=None,
                     precision=0,
-                    minimum=0,
-                    maximum=10000,
                 )
 
             with gr.Column():
                 firstflrsf = gr.Number(
                     label="Surface RDC (sq ft)",
-                    value=1100,
+                    value=None,
                     precision=0,
-                    minimum=100,
-                    maximum=8000,
                 )
                 garagearea = gr.Number(
                     label="Surface du garage (sq ft)",
-                    value=480,
+                    value=None,
                     precision=0,
-                    minimum=0,
-                    maximum=3000,
                 )
                 fullbath = gr.Number(
                     label="Salles de bain completes",
-                    value=2,
+                    value=None,
                     precision=0,
-                    minimum=0,
-                    maximum=6,
                 )
                 bedrooms = gr.Number(
                     label="Chambres",
-                    value=3,
+                    value=None,
                     precision=0,
-                    minimum=0,
-                    maximum=12,
                 )
                 exterqual = gr.Dropdown(
                     label="Qualite exterieure",
                     choices=[
                         (f"{q} - {QUALITES_LABELS[q]}", q) for q in ORDRE_QUALITES
                     ],
-                    value="TA",
+                    value=None,
                 )
 
         with gr.Accordion("Caracteristiques detaillees", open=False):
+            gr.Markdown(
+                "Champs optionnels : laissez vide ce que vous ne connaissez pas, "
+                "des valeurs typiques d'Ames seront utilisees."
+            )
             with gr.Row():
                 with gr.Column():
                     gr.Markdown("**Construction**")
                     yearremod = gr.Number(
                         label="Annee derniere renovation",
-                        value=1970,
+                        value=None,
                         precision=0,
-                        minimum=1800,
-                        maximum=2030,
                     )
                     overallcond = gr.Number(
                         label="Etat general (1-10)",
-                        value=5,
+                        value=None,
                         precision=0,
-                        minimum=1,
-                        maximum=10,
                     )
                     housestyle = gr.Dropdown(
                         label="Style de maison",
-                        choices=["1Story", "2Story", "1.5Fin", "SLvl", "SFoyer"],
-                        value="1Story",
+                        choices=[
+                            "1Story",
+                            "1.5Fin",
+                            "1.5Unf",
+                            "2Story",
+                            "2.5Fin",
+                            "2.5Unf",
+                            "SFoyer",
+                            "SLvl",
+                        ],
+                        value=None,
                     )
                     gr.Markdown("**Sous-sol**")
                     bsmtqual = gr.Dropdown(
                         label="Qualite du sous-sol",
                         choices=["None"] + ORDRE_QUALITES,
-                        value="Gd",
+                        value=None,
                     )
                     bsmtexposure = gr.Dropdown(
                         label="Exposition du sous-sol",
                         choices=["None", "No", "Mn", "Av", "Gd"],
-                        value="No",
+                        value=None,
                     )
 
                 with gr.Column():
@@ -589,21 +658,19 @@ def construire_interface() -> gr.Blocks:
                     garagefinish = gr.Dropdown(
                         label="Finition du garage",
                         choices=["None", "Unf", "RFn", "Fin"],
-                        value="Unf",
+                        value=None,
                     )
                     gr.Markdown("**Cuisine**")
                     kitchenqual = gr.Dropdown(
                         label="Qualite cuisine",
                         choices=ORDRE_QUALITES,
-                        value="TA",
+                        value=None,
                     )
                     gr.Markdown("**Exterieur**")
                     openporchsf = gr.Number(
                         label="Porche ouvert (sq ft)",
-                        value=25,
+                        value=None,
                         precision=0,
-                        minimum=0,
-                        maximum=1000,
                     )
 
         with gr.Accordion("Caracteristiques particulieres", open=False):
@@ -619,8 +686,6 @@ def construire_interface() -> gr.Blocks:
                         label="Surface piscine (sq ft)",
                         value=400,
                         precision=0,
-                        minimum=0,
-                        maximum=2000,
                         visible=False,
                     )
 
@@ -629,8 +694,6 @@ def construire_interface() -> gr.Blocks:
                         label="Nombre de cheminees",
                         value=2,
                         precision=0,
-                        minimum=0,
-                        maximum=4,
                         visible=False,
                     )
 
@@ -640,8 +703,6 @@ def construire_interface() -> gr.Blocks:
                         label="Places de garage",
                         value=3,
                         precision=0,
-                        minimum=0,
-                        maximum=5,
                         visible=False,
                     )
 
@@ -650,8 +711,6 @@ def construire_interface() -> gr.Blocks:
                         label="Surface terrasse (sq ft)",
                         value=300,
                         precision=0,
-                        minimum=0,
-                        maximum=1500,
                         visible=False,
                     )
 
